@@ -1,0 +1,20 @@
+### 1. Cadastrar um novo usuário (PARA TER UM USUÁRIO DE TESTE)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "name": "Usuario Teste",
+  "email": "teste@email.com",
+  "password": "123",
+  "role": "PROGRAMADOR"
+}
+
+###
+### 2. Tentar fazer login com as credenciais corretas
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "email": "teste@email.com",
+  "password": "123"
+}
