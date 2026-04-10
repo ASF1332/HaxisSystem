@@ -11,7 +11,11 @@
         /* ========== LOGIN ========== */
         #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
         .login-box { background: #1e293b; padding: 40px; border-radius: 16px; border: 1px solid #334155; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .login-box h1 { text-align: center; color: #38bdf8; margin-bottom: 8px; font-size: 28px; }
+        .login-brand { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 18px; }
+        .login-box h1 { text-align: center; color: #38bdf8; margin-bottom: 0; font-size: 28px; line-height: 1; }
+        .brand-mark { width: 60px; height: 60px; object-fit: contain; display: block; margin: 0; }
+        .sidebar-brand { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: left; }
+        .sidebar-brand img { width: 42px; height: 42px; object-fit: contain; }
         .login-box .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 14px; }
         .login-box label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 6px; }
         .login-box input { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; margin-bottom: 16px; }
@@ -28,7 +32,6 @@
         .sidebar { width: 240px; background: #1e293b; border-right: 1px solid #334155; padding: 0; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; }
         .sidebar-header { padding: 20px; border-bottom: 1px solid #334155; }
         .sidebar-header h2 { color: #38bdf8; font-size: 20px; }
-        .sidebar-header p { color: #64748b; font-size: 12px; margin-top: 4px; }
         .sidebar nav { padding: 12px 0; }
         .sidebar nav a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: all 0.15s; }
         .sidebar nav a:hover { background: #334155; color: #e2e8f0; }
@@ -40,9 +43,17 @@
         .main { margin-left: 240px; flex: 1; }
         .topbar { background: #1e293b; border-bottom: 1px solid #334155; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
         .topbar h2 { font-size: 20px; color: #e2e8f0; }
-        .topbar-user { display: flex; align-items: center; gap: 12px; }
-        .topbar-user .name { color: #94a3b8; font-size: 13px; }
-        .topbar-user .role { background: #0ea5e922; color: #38bdf8; padding: 2px 10px; border-radius: 12px; font-size: 11px; }
+        .topbar-user { display: flex; align-items: center; gap: 12px; padding: 8px 14px; border: 1px solid #334155; border-radius: 16px; background: #0f172a; }
+        .topbar-avatar { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; color: #38bdf8; background: rgba(14, 165, 233, 0.16); border: 1px solid currentColor; flex-shrink: 0; }
+        .topbar-avatar svg { width: 24px; height: 24px; stroke: currentColor; }
+        .topbar-identity { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+        .topbar-identity .name { color: #e2e8f0; font-size: 14px; font-weight: 700; line-height: 1.1; }
+        .topbar-identity .role { color: #94a3b8; font-size: 12px; line-height: 1.1; }
+        .topbar-user.role-serralheiro .topbar-avatar { color: #f59e0b; background: rgba(245, 158, 11, 0.16); }
+        .topbar-user.role-mecanico .topbar-avatar { color: #22c55e; background: rgba(34, 197, 94, 0.16); }
+        .topbar-user.role-automacao .topbar-avatar { color: #38bdf8; background: rgba(56, 189, 248, 0.16); }
+        .topbar-user.role-dev .topbar-avatar { color: #a78bfa; background: rgba(167, 139, 250, 0.16); }
+        .topbar-user.role-gestor .topbar-avatar { color: #f97316; background: rgba(249, 115, 22, 0.16); }
         .content { padding: 24px; }
 
         /* ========== CARDS / STATS ========== */
@@ -62,9 +73,9 @@
         .badge.EM_REVISAO { background: #a855f722; color: #a855f7; }
         .badge.CONCLUIDO { background: #22c55e22; color: #22c55e; }
         .badge.CANCELADO { background: #ef444422; color: #ef4444; }
-        .badge.SERRALHERIA { background: #eab30822; color: #eab308; }
         .badge.AUTOMACAO { background: #06b6d422; color: #06b6d4; }
-        .badge.ENGENHARIA_MECANICA { background: #8b5cf622; color: #8b5cf6; }
+        .badge.MECANICA { background: #22c55e22; color: #22c55e; }
+        .badge.DEV { background: #a78bfa22; color: #a78bfa; }
 
         /* ========== TABLE ========== */
         .table-wrapper { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
@@ -107,6 +118,9 @@
         .media-card img, .media-card video { width: 100%; height: 160px; object-fit: cover; }
         .media-card .info { padding: 10px; }
         .media-card .info p { font-size: 12px; color: #94a3b8; }
+        .project-cover-thumb { width: 54px; height: 54px; object-fit: cover; border-radius: 10px; border: 1px solid #334155; background: #0f172a; }
+        .project-cover-placeholder { width: 54px; height: 54px; border-radius: 10px; border: 1px dashed #334155; background: #0f172a; color: #64748b; display: grid; place-items: center; font-size: 11px; text-transform: uppercase; }
+        .project-cover-preview { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; border: 1px solid #334155; margin-top: 8px; }
 
         /* ========== PROJECT DETAIL ========== */
         .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
@@ -136,7 +150,10 @@
 <!-- ========== LOGIN ========== -->
 <div id="login-screen">
     <div class="login-box">
-        <h1>🔧 HaxisSystem</h1>
+        <div class="login-brand">
+            <img src="/logo-haxis.png" alt="Logo Haxis" class="brand-mark">
+            <h1>HaxisSystem</h1>
+        </div>
         <p class="subtitle">Sistema de Gestão de Projetos</p>
         <div class="login-error" id="login-error">Credenciais inválidas.</div>
         <form onsubmit="doLogin(event)">
@@ -154,8 +171,10 @@
     <div class="layout">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>🔧 HaxisSystem</h2>
-                <p id="sidebar-user">Usuário</p>
+                <div class="sidebar-brand">
+                    <img src="/logo-haxis.png" alt="Logo Haxis">
+                    <h2>HaxisSystem</h2>
+                </div>
             </div>
             <nav>
                 <a href="#" class="active" onclick="navigate('dashboard', this)"><span class="icon">📊</span> Dashboard</a>
@@ -172,9 +191,17 @@
         <div class="main">
             <div class="topbar">
                 <h2 id="page-title">Dashboard</h2>
-                <div class="topbar-user">
-                    <span class="name" id="topbar-name">Usuário</span>
-                    <span class="role" id="topbar-role">Role</span>
+                <div class="topbar-user" id="topbar-user-card">
+                    <div class="topbar-avatar" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"></path>
+                            <circle cx="12" cy="8" r="5"></circle>
+                        </svg>
+                    </div>
+                    <div class="topbar-identity">
+                        <span class="name" id="topbar-name">Usuário</span>
+                        <span class="role" id="topbar-role">Cargo</span>
+                    </div>
                 </div>
             </div>
             <div class="content" id="content"></div>
@@ -194,6 +221,28 @@
 const API = '/api';
 let token = null;
 let currentUser = null;
+const inventoryCategoryLabels = {
+    SERRALHERIA: 'Serralheria',
+    MECANICA: 'Mecânica',
+    ELETRICA: 'Elétrica',
+    PNEUMATICA: 'Pneumática',
+    OUTROS: 'Outros'
+};
+const projectSectorLabels = {
+    AUTOMACAO: 'Automação',
+    MECANICA: 'Mecânica',
+    DEV: 'Dev'
+};
+const roleMeta = {
+    GESTOR: { label: 'Gestor', className: 'role-gestor' },
+    PROGRAMADOR: { label: 'Dev', className: 'role-dev' },
+    DESENVOLVEDOR: { label: 'Dev', className: 'role-dev' },
+    ENGENHEIRO_MECANICO: { label: 'Mecânico', className: 'role-mecanico' },
+    MECANICO: { label: 'Mecânico', className: 'role-mecanico' },
+    ENGENHEIRO_ELETRICO: { label: 'Automação', className: 'role-automacao' },
+    AUTOMACAO: { label: 'Automação', className: 'role-automacao' },
+    SERRALHEIRO: { label: 'Serralheiro', className: 'role-serralheiro' }
+};
 
 // ========== AUTH ==========
 async function doLogin(e) {
@@ -236,9 +285,11 @@ function doLogout() {
 function showApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
-    document.getElementById('sidebar-user').textContent = currentUser.name;
+    const roleInfo = roleMeta[currentUser.role] || { label: currentUser.role.replace(/_/g, ' '), className: 'role-gestor' };
+    const userCard = document.getElementById('topbar-user-card');
     document.getElementById('topbar-name').textContent = currentUser.name;
-    document.getElementById('topbar-role').textContent = currentUser.role.replace(/_/g, ' ');
+    document.getElementById('topbar-role').textContent = roleInfo.label;
+    userCard.className = `topbar-user ${roleInfo.className}`;
     navigate('dashboard');
 }
 
@@ -324,9 +375,9 @@ async function renderDashboard(container) {
                 <div class="table-wrapper">
                     <div style="padding:16px;border-bottom:1px solid #334155;"><h3 style="font-size:16px;color:#e2e8f0;">Projetos por Setor</h3></div>
                     <table><tbody>
-                        <tr><td>Serralheria</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.serralheria || 0}</td></tr>
                         <tr><td>Automação</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.automacao || 0}</td></tr>
-                        <tr><td>Engenharia Mecânica</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.engenharia_mecanica || 0}</td></tr>
+                        <tr><td>Mecânica</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.mecanica || 0}</td></tr>
+                        <tr><td>Dev</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.dev || 0}</td></tr>
                     </tbody></table>
                 </div>
                 <div class="table-wrapper">
@@ -366,9 +417,9 @@ async function renderProjects(container) {
             <div class="filters">
                 <select id="filter-sector" onchange="filterProjects()">
                     <option value="">Todos os setores</option>
-                    <option value="SERRALHERIA">Serralheria</option>
                     <option value="AUTOMACAO">Automação</option>
-                    <option value="ENGENHARIA_MECANICA">Engenharia Mecânica</option>
+                    <option value="MECANICA">Mecânica</option>
+                    <option value="DEV">Dev</option>
                 </select>
                 <select id="filter-status" onchange="filterProjects()">
                     <option value="">Todos os status</option>
@@ -383,7 +434,7 @@ async function renderProjects(container) {
             <button class="btn btn-primary" onclick="openProjectModal()">+ Novo Projeto</button>
         </div>
         <div class="table-wrapper">
-            <table><thead><tr><th>Título</th><th>Setor</th><th>Status</th><th>Início</th><th>Fim</th><th>Ações</th></tr></thead>
+            <table><thead><tr><th>Título</th><th>Imagem</th><th>Setor</th><th>Status</th><th>Início</th><th>Fim</th><th>Ações</th></tr></thead>
             <tbody id="projects-tbody"></tbody></table>
         </div>
     `;
@@ -402,14 +453,15 @@ function filterProjects() {
         if (status) filtered = filtered.filter(p => p.status === status);
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum projeto encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum projeto encontrado.</td></tr>';
             return;
         }
 
         tbody.innerHTML = filtered.map(p => `
             <tr>
                 <td><strong>${p.title}</strong></td>
-                <td><span class="badge ${p.sector}">${p.sector.replace(/_/g, ' ')}</span></td>
+                <td>${p.coverImageUrl ? `<img src="${p.coverImageUrl}" alt="Capa de ${p.title}" class="project-cover-thumb">` : '<div class="project-cover-placeholder">Sem</div>'}</td>
+                <td><span class="badge ${p.sector}">${projectSectorLabels[p.sector] || p.sector}</span></td>
                 <td><span class="badge ${p.status}">${p.status.replace(/_/g, ' ')}</span></td>
                 <td>${p.startDate ? new Date(p.startDate).toLocaleDateString('pt-BR') : '-'}</td>
                 <td>${p.endDate ? new Date(p.endDate).toLocaleDateString('pt-BR') : '-'}</td>
@@ -444,9 +496,9 @@ function openProjectModal(id = null) {
             <label>Setor</label>
             <select id="m-p-sector" required>
                 <option value="">Selecione</option>
-                <option value="SERRALHERIA" ${projectData.sector === 'SERRALHERIA' ? 'selected' : ''}>Serralheria</option>
                 <option value="AUTOMACAO" ${projectData.sector === 'AUTOMACAO' ? 'selected' : ''}>Automação</option>
-                <option value="ENGENHARIA_MECANICA" ${projectData.sector === 'ENGENHARIA_MECANICA' ? 'selected' : ''}>Engenharia Mecânica</option>
+                <option value="MECANICA" ${projectData.sector === 'MECANICA' ? 'selected' : ''}>Mecânica</option>
+                <option value="DEV" ${projectData.sector === 'DEV' ? 'selected' : ''}>Dev</option>
             </select>
             <label>Status</label>
             <select id="m-p-status">
@@ -461,6 +513,9 @@ function openProjectModal(id = null) {
             <input id="m-p-start" type="date" value="${projectData.startDate || ''}" required>
             <label>Data de Fim</label>
             <input id="m-p-end" type="date" value="${projectData.endDate || ''}">
+            <label>Imagem de Capa</label>
+            <input id="m-p-cover" type="file" accept="image/*">
+            <div id="m-p-cover-preview">${projectData.coverImageUrl ? `<img src="${projectData.coverImageUrl}" alt="Capa atual" class="project-cover-preview">` : ''}</div>
             <div class="modal-actions">
                 <button class="btn btn-outline" type="button" onclick="closeModal()">Cancelar</button>
                 <button class="btn btn-primary" type="submit">Salvar</button>
@@ -476,10 +531,14 @@ function fillProjectForm(p) {
     document.getElementById('m-p-status').value = p.status || 'PLANEJAMENTO';
     document.getElementById('m-p-start').value = p.startDate || '';
     document.getElementById('m-p-end').value = p.endDate || '';
+    document.getElementById('m-p-cover-preview').innerHTML = p.coverImageUrl
+        ? `<img src="${p.coverImageUrl}" alt="Capa atual" class="project-cover-preview">`
+        : '';
 }
 
 async function saveProject(e, id) {
     e.preventDefault();
+    const coverFile = document.getElementById('m-p-cover').files[0];
     const body = {
         title: document.getElementById('m-p-title').value,
         description: document.getElementById('m-p-desc').value,
@@ -490,16 +549,34 @@ async function saveProject(e, id) {
     };
 
     try {
+        let project;
         if (id) {
-            await api(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+            project = await api(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(body) });
             toast('Projeto atualizado!');
         } else {
-            await api('/projects', { method: 'POST', body: JSON.stringify(body) });
+            project = await api('/projects', { method: 'POST', body: JSON.stringify(body) });
             toast('Projeto criado!');
+        }
+        if (coverFile) {
+            await uploadProjectCover(project.id, coverFile);
         }
         closeModal();
         renderProjects(document.getElementById('content'));
     } catch(e) {}
+}
+
+async function uploadProjectCover(projectId, file) {
+    const formData = new FormData();
+    formData.append('coverImage', file);
+
+    const res = await fetch(`${API}/projects/${projectId}/cover`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Erro ao enviar capa do projeto.');
+    return data;
 }
 
 async function deleteProject(id) {
@@ -524,7 +601,7 @@ async function showProjectDetail(id) {
             <div>
                 <h3>${p.title}</h3>
                 <div class="detail-meta" style="margin-top:8px;">
-                    <span class="badge ${p.sector}">${p.sector.replace(/_/g, ' ')}</span>
+                    <span class="badge ${p.sector}">${projectSectorLabels[p.sector] || p.sector}</span>
                     <span class="badge ${p.status}">${p.status.replace(/_/g, ' ')}</span>
                 </div>
             </div>
@@ -533,6 +610,8 @@ async function showProjectDetail(id) {
                 <button class="btn btn-primary" onclick="openMediaUploadModal('${p.id}')">📸 Upload Mídia</button>
             </div>
         </div>
+
+        ${p.coverImageUrl ? `<div class="detail-section"><img src="${p.coverImageUrl}" alt="Capa de ${p.title}" class="project-cover-preview"></div>` : ''}
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
             <div class="stat-card"><div class="label">Data de Início</div><div class="number" style="font-size:18px;">${p.startDate ? new Date(p.startDate).toLocaleDateString('pt-BR') : '-'}</div></div>
@@ -664,7 +743,7 @@ async function renderInventory(container) {
             <button class="btn btn-primary" onclick="openItemModal()">+ Novo Item</button>
         </div>
         <div class="table-wrapper">
-            <table><thead><tr><th>Nº</th><th>Descrição</th><th>Fabricante</th><th>Código</th><th>Qtd</th><th>Unidade</th><th>Ações</th></tr></thead>
+            <table><thead><tr><th>Nº</th><th>Descrição</th><th>Categoria</th><th>Fabricante</th><th>Código</th><th>Qtd</th><th>Unidade</th><th>Ações</th></tr></thead>
             <tbody id="inventory-tbody"></tbody></table>
         </div>
     `;
@@ -681,7 +760,7 @@ function filterInventory() {
         if (cat) filtered = filtered.filter(i => i.category === cat);
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum item encontrado.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhum item encontrado.</td></tr>';
             return;
         }
 
@@ -689,6 +768,7 @@ function filterInventory() {
             <tr>
                 <td style="font-weight:bold;color:#38bdf8;">${item.numero}</td>
                 <td><strong>${item.description}</strong></td>
+                <td>${inventoryCategoryLabels[item.category] || item.category}</td>
                 <td>${item.fabricante}</td>
                 <td style="font-family:monospace;">${item.codigo}</td>
                 <td style="font-weight:bold;">${item.quantity}</td>

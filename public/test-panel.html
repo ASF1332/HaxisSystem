@@ -8,6 +8,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
         h1 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
+        .page-brand { text-align: center; margin-bottom: 20px; }
+        .page-brand img { width: 90px; height: auto; display: block; margin: 0 auto 10px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
         .card h2, .card h3 { color: #38bdf8; margin-bottom: 10px; }
@@ -34,7 +36,8 @@
         .badge.cancelado { background: #ef444433; color: #ef4444; }
         .badge.SERRALHERIA { background: #eab30833; color: #eab308; }
         .badge.AUTOMACAO { background: #06b6d433; color: #06b6d4; }
-        .badge.ENGENHARIA_MECANICA { background: #8b5cf633; color: #8b5cf6; }
+        .badge.MECANICA { background: #22c55e33; color: #22c55e; }
+        .badge.DEV { background: #a78bfa33; color: #a78bfa; }
         .status { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
         .status span { color: #94a3b8; font-size: 14px; }
         .error { color: #fca5a5; }
@@ -43,7 +46,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>HaxisSystem - Painel</h1>
+    <div class="page-brand">
+        <img src="/logo-haxis.png" alt="Logo Haxis">
+        <h1>HaxisSystem - Painel</h1>
+    </div>
 
     <div class="card">
         <h2>Autenticacao</h2>
@@ -88,9 +94,9 @@
                     <textarea id="p-desc" placeholder="Descricao"></textarea>
                     <select id="p-sector" required>
                         <option value="">Selecione o setor</option>
-                        <option value="SERRALHERIA">Serralheria</option>
-                        <option value="AUTOMACAO">Automacao</option>
-                        <option value="ENGENHARIA_MECANICA">Engenharia Mecanica</option>
+                        <option value="AUTOMACAO">Automação</option>
+                        <option value="MECANICA">Mecânica</option>
+                        <option value="DEV">Dev</option>
                     </select>
                     <input id="p-start" type="date" required>
                     <input id="p-end" type="date">
@@ -110,9 +116,9 @@
                     <select id="i-category" required>
                         <option value="">Selecione a categoria</option>
                         <option value="SERRALHERIA">Serralheria</option>
-                        <option value="MECANICA">Mecanica</option>
-                        <option value="ELETRICA">Eletrica</option>
-                        <option value="PNEUMATICA">Pneumatica</option>
+                        <option value="MECANICA">Mecânica</option>
+                        <option value="ELETRICA">Elétrica</option>
+                        <option value="PNEUMATICA">Pneumática</option>
                         <option value="OUTROS">Outros</option>
                     </select>
                     <input id="i-qty" type="number" placeholder="Quantidade" min="0" value="0">
@@ -137,6 +143,18 @@
 const API = 'http://localhost:3000/api';
 let token = null;
 let currentUser = null;
+const projectSectorLabels = {
+    AUTOMACAO: 'Automação',
+    MECANICA: 'Mecânica',
+    DEV: 'Dev'
+};
+const inventoryCategoryLabels = {
+    SERRALHERIA: 'Serralheria',
+    MECANICA: 'Mecânica',
+    ELETRICA: 'Elétrica',
+    PNEUMATICA: 'Pneumática',
+    OUTROS: 'Outros'
+};
 
 function updateAuthUI() {
     document.getElementById('app').classList.toggle('hidden', !token);
@@ -218,7 +236,7 @@ async function loadProjects() {
             <h3>${project.title}</h3>
             <p style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${project.description || 'Sem descricao'}</p>
             <span class="badge ${statusClass}">${project.status.replace(/_/g, ' ')}</span>
-            <span class="badge ${project.sector}">${project.sector.replace(/_/g, ' ')}</span>
+            <span class="badge ${project.sector}">${projectSectorLabels[project.sector] || project.sector}</span>
             <div style="margin-top:8px;font-size:13px;color:#64748b;">
                 Inicio: ${new Date(project.startDate).toLocaleDateString('pt-BR')}
                 ${project.endDate ? ' | Fim: ' + new Date(project.endDate).toLocaleDateString('pt-BR') : ''}
@@ -240,9 +258,9 @@ async function loadInventory() {
         <div class="card">
             <h3>#${item.numero} ${item.description}</h3>
             <p style="font-size:14px;">Quantidade: <strong>${item.quantity}</strong> ${item.unit}</p>
-            <p style="font-size:12px;color:#94a3b8;">Categoria: ${item.category.replace(/_/g, ' ')}</p>
+            <p style="font-size:12px;color:#94a3b8;">Categoria: ${inventoryCategoryLabels[item.category] || item.category}</p>
             <p style="font-size:12px;color:#94a3b8;">Fabricante: ${item.fabricante}</p>
-            <p style="font-size:12px;color:#94a3b8;">Codigo: ${item.codigo}</p>
+            <p style="font-size:12px;color:#94a3b8;">Código: ${item.codigo}</p>
         </div>
     `).join('');
 }

@@ -1,6 +1,6 @@
 # HaxisSystem
 
-Sistema de gestao de projetos, estoque e midia para operacoes de serralheria, automacao e engenharia mecanica.
+Sistema de gestao de projetos, estoque e midia para operacoes de automacao, mecanica e desenvolvimento.
 
 O estado atual do projeto e um backend em `Express + TypeScript`, com persistencia em memoria, arquivos estaticos servidos pelo proprio backend e upload local em disco para anexos de projeto.
 
@@ -9,7 +9,7 @@ O estado atual do projeto e um backend em `Express + TypeScript`, com persistenc
 O sistema hoje e composto por 5 dominios principais:
 
 - `Usuarios/Auth`: cadastro de usuario, login por email ou nome e emissao de JWT.
-- `Projetos`: CRUD de projetos, filtros e atualizacao de status.
+- `Projetos`: CRUD de projetos, filtros, capa do projeto e atualizacao de status.
 - `Estoque`: CRUD de itens, movimentacoes de entrada/saida e consulta de historico.
 - `Midia`: upload e exclusao de imagens/videos vinculados a projetos.
 - `Dashboard`: agregacoes de projetos e estoque para o frontend.
@@ -18,6 +18,7 @@ Tambem existe um frontend estatico simples em `public/`:
 
 - `public/index.html`: painel principal da aplicacao.
 - `public/test-panel.html`: painel rapido de testes manuais.
+- `public/logo-haxis.png`: logo utilizado no frontend estatico.
 
 ## Topologia
 
@@ -49,6 +50,7 @@ Tambem existe um frontend estatico simples em `public/`:
   - CRUD de projetos
   - CRUD de estoque
   - Upload e listagem de midias
+  - Marca com logo Haxis e cabeçalho de usuário com avatar por cargo
 
 - `public/test-panel.html`
   - Tela reduzida para testes de projeto e estoque
@@ -74,6 +76,7 @@ Se o processo reiniciar, esses dados em memoria sao perdidos.
 .
 ├── public/
 │   ├── index.html
+│   ├── logo-haxis.png
 │   └── test-panel.html
 ├── src/
 │   ├── controllers/
@@ -153,15 +156,16 @@ Arquivos:
 Responsabilidades:
 
 - Criar, listar, detalhar, editar e excluir projetos
+- Fazer upload da imagem de capa do projeto
 - Filtrar por `sector`, `status` e `responsibleId`
 - Atualizar status por endpoint dedicado
 - Fornecer os dados agregados consumidos pelo dashboard
 
 Setores:
 
-- `SERRALHERIA`
 - `AUTOMACAO`
-- `ENGENHARIA_MECANICA`
+- `MECANICA`
+- `DEV`
 
 Status:
 
@@ -311,6 +315,7 @@ Rotas protegidas por JWT:
 |---|---|---|
 | POST | `/api/projects` | Cria projeto |
 | GET | `/api/projects` | Lista projetos com filtros opcionais |
+| POST | `/api/projects/:id/cover` | Faz upload da capa do projeto |
 | GET | `/api/projects/:id` | Busca projeto por ID |
 | PUT | `/api/projects/:id` | Atualiza projeto |
 | DELETE | `/api/projects/:id` | Exclui projeto |
@@ -372,6 +377,13 @@ Filtro suportado em `GET /api/inventory`:
 2. O backend gera `id`, `createdAt` e `updatedAt`.
 3. O projeto fica disponivel nas rotas de listagem, detalhe e dashboard.
 
+### Upload de capa do projeto
+
+1. O cliente envia `multipart/form-data` para `POST /api/projects/:id/cover`.
+2. O backend salva a imagem em `uploads/project-covers/`.
+3. O projeto passa a expor `coverImageUrl` para uso na listagem e no detalhe.
+4. Ao substituir a capa, o arquivo anterior e removido do disco.
+
 ### Cadastro e movimentacao de estoque
 
 1. O item recebe `numero` sequencial automatico.
@@ -393,9 +405,10 @@ Contem um painel completo com:
 
 - tela de login
 - dashboard inicial
-- listagem, criacao, edicao e exclusao de projetos
+- listagem, criacao, edicao e exclusao de projetos com coluna de imagem
+- upload de capa do projeto
 - detalhe de projeto com midias
-- listagem, criacao, edicao e exclusao de itens de estoque
+- listagem, criacao, edicao e exclusao de itens de estoque com coluna de categoria
 - movimentacao de estoque
 - listagem global de midias
 

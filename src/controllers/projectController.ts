@@ -1,10 +1,17 @@
 // src/controllers/projectController.ts
 
 import { Request, Response } from 'express';
+import fs from 'fs';
 import { Project, ProjectSector, ProjectStatus } from '../models/Project';
 
 // Em memória - substituir por banco de dados real
 const projects: Project[] = [];
+
+const removeProjectCover = (project: Project) => {
+    if (project.coverImageFileKey && fs.existsSync(project.coverImageFileKey)) {
+        fs.unlinkSync(project.coverImageFileKey);
+    }
+};
 
 // --- CREATE ---
 export const createProject = async (req: Request, res: Response) => {
@@ -26,6 +33,8 @@ export const createProject = async (req: Request, res: Response) => {
             startDate,
             endDate: endDate || null,
             responsibleId,
+            coverImageUrl: null,
+            coverImageFileKey: null,
             createdAt: now,
             updatedAt: now
         };
@@ -113,6 +122,7 @@ export const deleteProject = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'Projeto não encontrado.' });
         }
 
+        removeProjectCover(projects[projectIndex]);
         projects.splice(projectIndex, 1);
 
         res.json({ message: 'Projeto excluído com sucesso.' });
@@ -153,6 +163,33 @@ export const updateProjectStatus = async (req: Request, res: Response) => {
         res.json(project);
     } catch (error) {
         res.status(500).json({ message: 'Erro interno no servidor.' });
+    }
+};
+
+// --- UPLOAD DE CAPA ---
+export const uploadProjectCover = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const project = projects.find(p => p.id === id);
+
+        if (!project) {
+            return res.status(404).json({ message: 'Projeto não encontrado.' });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'Arquivo de capa é obrigatório.' });
+        }
+
+        removeProjectCover(project);
+
+        const fileName = req.file.filename;
+        project.coverImageFileKey = req.file.path;
+        project.coverImageUrl = `/uploads/project-covers/${fileName}`;
+        project.updatedAt = new Date().toISOString();
+
+        return res.json(project);
+    } catch (error) {
+        return res.status(500).json({ message: 'Erro ao fazer upload da capa do projeto.' });
     }
 };
 

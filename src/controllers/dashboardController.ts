@@ -30,9 +30,9 @@ export const getDashboardMetrics = async (req: Request, res: Response) => {
 
         // Projetos por setor
         const projectsBySector = {
-            serralheria: projects.filter((p: Project) => p.sector === ProjectSector.SERRALHERIA).length,
             automacao: projects.filter((p: Project) => p.sector === ProjectSector.AUTOMACAO).length,
-            engenharia_mecanica: projects.filter((p: Project) => p.sector === ProjectSector.ENGENHARIA_MECANICA).length
+            mecanica: projects.filter((p: Project) => p.sector === ProjectSector.MECANICA).length,
+            dev: projects.filter((p: Project) => p.sector === ProjectSector.DEV).length
         };
 
         // Projetos atrasados

@@ -2,9 +2,9 @@
 
 // Setores da empresa
 export enum ProjectSector {
-    SERRALHERIA = 'SERRALHERIA',
     AUTOMACAO = 'AUTOMACAO',
-    ENGENHARIA_MECANICA = 'ENGENHARIA_MECANICA'
+    MECANICA = 'MECANICA',
+    DEV = 'DEV'
 }
 
 // Etapas/status de um projeto
@@ -26,6 +26,8 @@ export interface Project {
     startDate: string; // ISO date string
     endDate: string | null; // null = sem data definida
     responsibleId?: string; // ID do usuário responsável
+    coverImageUrl?: string | null;
+    coverImageFileKey?: string | null;
     createdAt: string;
     updatedAt: string;
 }
