@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaxisSystem</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+        /* ========== LOGIN ========== */
+        #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .login-box { background: #1e293b; padding: 40px; border-radius: 16px; border: 1px solid #334155; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .login-box h1 { text-align: center; color: #38bdf8; margin-bottom: 8px; font-size: 28px; }
+        .login-box .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 14px; }
+        .login-box label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 6px; }
+        .login-box input { width: 100%; padding: 12px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 14px; margin-bottom: 16px; }
+        .login-box input:focus { outline: none; border-color: #38bdf8; }
+        .login-btn { width: 100%; padding: 12px; background: #0ea5e9; border: none; border-radius: 8px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        .login-btn:hover { background: #0284c7; }
+        .login-error { background: #dc262622; border: 1px solid #dc2626; color: #fca5a5; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; display: none; }
+
+        /* ========== LAYOUT ========== */
+        #app-screen { display: none; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: 240px; background: #1e293b; border-right: 1px solid #334155; padding: 0; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #334155; }
+        .sidebar-header h2 { color: #38bdf8; font-size: 20px; }
+        .sidebar-header p { color: #64748b; font-size: 12px; margin-top: 4px; }
+        .sidebar nav { padding: 12px 0; }
+        .sidebar nav a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #94a3b8; text-decoration: none; font-size: 14px; transition: all 0.15s; }
+        .sidebar nav a:hover { background: #334155; color: #e2e8f0; }
+        .sidebar nav a.active { background: #0ea5e922; color: #38bdf8; border-left: 3px solid #38bdf8; }
+        .sidebar nav a .icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-logout { margin-top: auto; border-top: 1px solid #334155; padding-top: 12px; }
+
+        /* Main */
+        .main { margin-left: 240px; flex: 1; }
+        .topbar { background: #1e293b; border-bottom: 1px solid #334155; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h2 { font-size: 20px; color: #e2e8f0; }
+        .topbar-user { display: flex; align-items: center; gap: 12px; }
+        .topbar-user .name { color: #94a3b8; font-size: 13px; }
+        .topbar-user .role { background: #0ea5e922; color: #38bdf8; padding: 2px 10px; border-radius: 12px; font-size: 11px; }
+        .content { padding: 24px; }
+
+        /* ========== CARDS / STATS ========== */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; }
+        .stat-card .number { font-size: 32px; font-weight: bold; color: #38bdf8; }
+        .stat-card .label { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+        .stat-card.danger .number { color: #ef4444; }
+        .stat-card.success .number { color: #22c55e; }
+        .stat-card.warning .number { color: #f59e0b; }
+
+        /* ========== BADGES ========== */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.PLANEJAMENTO { background: #f59e0b22; color: #f59e0b; }
+        .badge.EM_ANDAMENTO { background: #3b82f622; color: #3b82f6; }
+        .badge.AGUARDANDO_MATERIAL { background: #f9731622; color: #f97316; }
+        .badge.EM_REVISAO { background: #a855f722; color: #a855f7; }
+        .badge.CONCLUIDO { background: #22c55e22; color: #22c55e; }
+        .badge.CANCELADO { background: #ef444422; color: #ef4444; }
+        .badge.SERRALHERIA { background: #eab30822; color: #eab308; }
+        .badge.AUTOMACAO { background: #06b6d422; color: #06b6d4; }
+        .badge.ENGENHARIA_MECANICA { background: #8b5cf622; color: #8b5cf6; }
+
+        /* ========== TABLE ========== */
+        .table-wrapper { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #0f172a; }
+        th { padding: 12px 16px; text-align: left; font-size: 12px; color: #94a3b8; font-weight: 600; text-transform: uppercase; }
+        td { padding: 12px 16px; border-top: 1px solid #334155; font-size: 14px; }
+        tbody tr:hover { background: #33415522; }
+        .empty { text-align: center; padding: 40px; color: #64748b; }
+
+        /* ========== BUTTONS ========== */
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .btn-primary { background: #0ea5e9; color: white; }
+        .btn-primary:hover { background: #0284c7; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-outline { background: transparent; border: 1px solid #334155; color: #94a3b8; }
+        .btn-outline:hover { border-color: #38bdf8; color: #38bdf8; }
+        .actions { display: flex; gap: 6px; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filters select, .filters input { padding: 6px 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; font-size: 13px; }
+
+        /* ========== MODAL ========== */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { color: #38bdf8; margin-bottom: 16px; }
+        .modal label { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 4px; margin-top: 12px; }
+        .modal input, .modal select, .modal textarea { width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; font-size: 14px; }
+        .modal textarea { min-height: 80px; resize: vertical; }
+        .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+        /* ========== MEDIA GRID ========== */
+        .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .media-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; overflow: hidden; }
+        .media-card img, .media-card video { width: 100%; height: 160px; object-fit: cover; }
+        .media-card .info { padding: 10px; }
+        .media-card .info p { font-size: 12px; color: #94a3b8; }
+
+        /* ========== PROJECT DETAIL ========== */
+        .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .detail-header h3 { font-size: 24px; color: #e2e8f0; }
+        .detail-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+        .detail-section { margin-bottom: 24px; }
+        .detail-section h4 { color: #94a3b8; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; }
+        .detail-section p { color: #e2e8f0; }
+
+        /* ========== TOAST ========== */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #22c55e; color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; display: none; z-index: 9999; }
+        .toast.error { background: #dc2626; }
+        .toast.show { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* ========== MOVE INVENTORY ========== */
+        .move-row { display: flex; gap: 8px; align-items: center; }
+        .move-row input { width: 80px; }
+
+        /* ========== BACK LINK ========== */
+        .back-link { color: #38bdf8; cursor: pointer; font-size: 13px; margin-bottom: 12px; display: inline-block; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="login-screen">
+    <div class="login-box">
+        <h1>🔧 HaxisSystem</h1>
+        <p class="subtitle">Sistema de Gestão de Projetos</p>
+        <div class="login-error" id="login-error">Credenciais inválidas.</div>
+        <form onsubmit="doLogin(event)">
+            <label>Email ou Nome</label>
+            <input id="login-email" placeholder="teste@email.com" required>
+            <label>Senha</label>
+            <input id="login-password" type="password" placeholder="123456" required>
+            <button class="login-btn" type="submit">Entrar</button>
+        </form>
+    </div>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="app-screen">
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🔧 HaxisSystem</h2>
+                <p id="sidebar-user">Usuário</p>
+            </div>
+            <nav>
+                <a href="#" class="active" onclick="navigate('dashboard', this)"><span class="icon">📊</span> Dashboard</a>
+                <a href="#" onclick="navigate('projects', this)"><span class="icon">📋</span> Projetos</a>
+                <a href="#" onclick="navigate('inventory', this)"><span class="icon">📦</span> Estoque</a>
+                <a href="#" onclick="navigate('media-all', this)"><span class="icon">📸</span> Todas as Mídias</a>
+            </nav>
+            <div class="sidebar-logout">
+                <nav>
+                    <a href="#" onclick="doLogout()"><span class="icon">🚪</span> Sair</a>
+                </nav>
+            </div>
+        </aside>
+        <div class="main">
+            <div class="topbar">
+                <h2 id="page-title">Dashboard</h2>
+                <div class="topbar-user">
+                    <span class="name" id="topbar-name">Usuário</span>
+                    <span class="role" id="topbar-role">Role</span>
+                </div>
+            </div>
+            <div class="content" id="content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== MODAL ========== -->
+<div class="modal-overlay" id="modal">
+    <div class="modal" id="modal-content"></div>
+</div>
+
+<!-- ========== TOAST ========== -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api';
+let token = null;
+let currentUser = null;
+
+// ========== AUTH ==========
+async function doLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+
+    try {
+        const res = await fetch(`${API}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            errEl.textContent = data.message || 'Erro ao fazer login.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        token = data.token;
+        currentUser = data.user;
+        errEl.style.display = 'none';
+        showApp();
+    } catch (err) {
+        errEl.textContent = 'Erro de conexão com o servidor.';
+        errEl.style.display = 'block';
+    }
+}
+
+function doLogout() {
+    token = null;
+    currentUser = null;
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display = 'none';
+}
+
+function showApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    document.getElementById('sidebar-user').textContent = currentUser.name;
+    document.getElementById('topbar-name').textContent = currentUser.name;
+    document.getElementById('topbar-role').textContent = currentUser.role.replace(/_/g, ' ');
+    navigate('dashboard');
+}
+
+// ========== NAV ==========
+function navigate(page, linkEl) {
+    if (linkEl) {
+        document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+        linkEl.classList.add('active');
+    }
+    const titles = { dashboard: 'Dashboard', projects: 'Projetos', inventory: 'Estoque', 'media-all': 'Todas as Mídias', 'project-detail': 'Detalhes do Projeto' };
+    document.getElementById('page-title').textContent = titles[page] || '';
+    const content = document.getElementById('content');
+
+    switch(page) {
+        case 'dashboard': renderDashboard(content); break;
+        case 'projects': renderProjects(content); break;
+        case 'inventory': renderInventory(content); break;
+        case 'media-all': renderAllMedia(content); break;
+        case 'project-detail': break; // handled by showProjectDetail
+    }
+}
+
+// ========== TOAST ==========
+function toast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ========== MODAL ==========
+function openModal(html) {
+    document.getElementById('modal-content').innerHTML = html;
+    document.getElementById('modal').classList.add('active');
+}
+function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+}
+document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// ========== API HELPERS ==========
+async function api(url, opts = {}) {
+    const headers = { ...opts.headers };
+    if (token && !opts.noAuth) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    if (!(opts.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+    const res = await fetch(`${API}${url}`, { ...opts, headers });
+    const data = await res.json();
+    if (!res.ok) {
+        toast(data.message || 'Erro na requisição.', true);
+        throw new Error(data.message);
+    }
+    return data;
+}
+
+// ========== DASHBOARD ==========
+async function renderDashboard(container) {
+    container.innerHTML = '<p style="color:#64748b;">Carregando...</p>';
+    try {
+        const [projects, items, dashboard] = await Promise.all([
+            api('/projects'),
+            api('/inventory'),
+            api('/dashboard')
+        ]);
+
+        const active = projects.filter(p => p.status === 'EM_ANDAMENTO').length;
+        const overdue = dashboard?.projetos?.atrasados || 0;
+
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><div class="number">${projects.length}</div><div class="label">Total de Projetos</div></div>
+                <div class="stat-card"><div class="number">${active}</div><div class="label">Em Andamento</div></div>
+                <div class="stat-card ${overdue > 0 ? 'danger' : 'success'}"><div class="number">${overdue}</div><div class="label">Projetos Atrasados</div></div>
+                <div class="stat-card"><div class="number">${items.length}</div><div class="label">Itens em Estoque</div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="table-wrapper">
+                    <div style="padding:16px;border-bottom:1px solid #334155;"><h3 style="font-size:16px;color:#e2e8f0;">Projetos por Setor</h3></div>
+                    <table><tbody>
+                        <tr><td>Serralheria</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.serralheria || 0}</td></tr>
+                        <tr><td>Automação</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.automacao || 0}</td></tr>
+                        <tr><td>Engenharia Mecânica</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porSetor?.engenharia_mecanica || 0}</td></tr>
+                    </tbody></table>
+                </div>
+                <div class="table-wrapper">
+                    <div style="padding:16px;border-bottom:1px solid #334155;"><h3 style="font-size:16px;color:#e2e8f0;">Projetos por Status</h3></div>
+                    <table><tbody>
+                        <tr><td>Planejamento</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porStatus?.planejamento || 0}</td></tr>
+                        <tr><td>Em Andamento</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porStatus?.em_andamento || 0}</td></tr>
+                        <tr><td>Aguardando Material</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porStatus?.aguardando_material || 0}</td></tr>
+                        <tr><td>Em Revisão</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porStatus?.em_revisao || 0}</td></tr>
+                        <tr><td>Concluído</td><td style="text-align:right;font-weight:bold;">${dashboard?.projetos?.porStatus?.concluido || 0}</td></tr>
+                    </tbody></table>
+                </div>
+            </div>
+
+            ${overdue > 0 ? `
+            <div style="margin-top:24px;">
+                <h3 style="color:#ef4444;margin-bottom:12px;">⚠️ Projetos Atrasados</h3>
+                <div class="table-wrapper"><table><thead><tr><th>Projeto</th><th>Setor</th><th>Data Fim</th></tr></thead><tbody>
+                    ${(dashboard?.projetos?.projetosAtrasados || []).map(p => `
+                        <tr><td>${p.title}</td><td><span class="badge ${p.sector}">${p.sector.replace(/_/g, ' ')}</span></td><td>${new Date(p.endDate).toLocaleDateString('pt-BR')}</td></tr>
+                    `).join('')}
+                </tbody></table></div>
+            </div>` : ''}
+        `;
+    } catch(e) {
+        container.innerHTML = '<p style="color:#ef4444;">Erro ao carregar dashboard. Verifique se o servidor está rodando.</p>';
+    }
+}
+
+// ========== PROJECTS ==========
+async function renderProjects(container) {
+    container.innerHTML = '<p style="color:#64748b;">Carregando projetos...</p>';
+    const projects = await api('/projects');
+
+    container.innerHTML = `
+        <div class="toolbar">
+            <div class="filters">
+                <select id="filter-sector" onchange="filterProjects()">
+                    <option value="">Todos os setores</option>
+                    <option value="SERRALHERIA">Serralheria</option>
+                    <option value="AUTOMACAO">Automação</option>
+                    <option value="ENGENHARIA_MECANICA">Engenharia Mecânica</option>
+                </select>
+                <select id="filter-status" onchange="filterProjects()">
+                    <option value="">Todos os status</option>
+                    <option value="PLANEJAMENTO">Planejamento</option>
+                    <option value="EM_ANDAMENTO">Em Andamento</option>
+                    <option value="AGUARDANDO_MATERIAL">Aguardando Material</option>
+                    <option value="EM_REVISAO">Em Revisão</option>
+                    <option value="CONCLUIDO">Concluído</option>
+                    <option value="CANCELADO">Cancelado</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="openProjectModal()">+ Novo Projeto</button>
+        </div>
+        <div class="table-wrapper">
+            <table><thead><tr><th>Título</th><th>Setor</th><th>Status</th><th>Início</th><th>Fim</th><th>Ações</th></tr></thead>
+            <tbody id="projects-tbody"></tbody></table>
+        </div>
+    `;
+    filterProjects();
+}
+
+function filterProjects() {
+    const sector = document.getElementById('filter-sector')?.value || '';
+    const status = document.getElementById('filter-status')?.value || '';
+    const tbody = document.getElementById('projects-tbody');
+    if (!tbody) return;
+
+    api('/projects').then(projects => {
+        let filtered = projects;
+        if (sector) filtered = filtered.filter(p => p.sector === sector);
+        if (status) filtered = filtered.filter(p => p.status === status);
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum projeto encontrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(p => `
+            <tr>
+                <td><strong>${p.title}</strong></td>
+                <td><span class="badge ${p.sector}">${p.sector.replace(/_/g, ' ')}</span></td>
+                <td><span class="badge ${p.status}">${p.status.replace(/_/g, ' ')}</span></td>
+                <td>${p.startDate ? new Date(p.startDate).toLocaleDateString('pt-BR') : '-'}</td>
+                <td>${p.endDate ? new Date(p.endDate).toLocaleDateString('pt-BR') : '-'}</td>
+                <td><div class="actions">
+                    <button class="btn btn-outline btn-sm" onclick="showProjectDetail('${p.id}')">Ver</button>
+                    <button class="btn btn-outline btn-sm" onclick="openProjectModal('${p.id}')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">🗑</button>
+                </div></td>
+            </tr>
+        `).join('');
+    });
+}
+
+function openProjectModal(id = null) {
+    const isEdit = !!id;
+    let projectData = {};
+
+    if (isEdit) {
+        api(`/projects/${id}`).then(p => {
+            projectData = p;
+            fillProjectForm(p);
+        });
+    }
+
+    openModal(`
+        <h3>${isEdit ? 'Editar' : 'Novo'} Projeto</h3>
+        <form onsubmit="saveProject(event, '${id || ''}')">
+            <label>Título</label>
+            <input id="m-p-title" value="${projectData.title || ''}" required>
+            <label>Descrição</label>
+            <textarea id="m-p-desc">${projectData.description || ''}</textarea>
+            <label>Setor</label>
+            <select id="m-p-sector" required>
+                <option value="">Selecione</option>
+                <option value="SERRALHERIA" ${projectData.sector === 'SERRALHERIA' ? 'selected' : ''}>Serralheria</option>
+                <option value="AUTOMACAO" ${projectData.sector === 'AUTOMACAO' ? 'selected' : ''}>Automação</option>
+                <option value="ENGENHARIA_MECANICA" ${projectData.sector === 'ENGENHARIA_MECANICA' ? 'selected' : ''}>Engenharia Mecânica</option>
+            </select>
+            <label>Status</label>
+            <select id="m-p-status">
+                <option value="PLANEJAMENTO" ${projectData.status === 'PLANEJAMENTO' ? 'selected' : ''}>Planejamento</option>
+                <option value="EM_ANDAMENTO" ${projectData.status === 'EM_ANDAMENTO' ? 'selected' : ''}>Em Andamento</option>
+                <option value="AGUARDANDO_MATERIAL" ${projectData.status === 'AGUARDANDO_MATERIAL' ? 'selected' : ''}>Aguardando Material</option>
+                <option value="EM_REVISAO" ${projectData.status === 'EM_REVISAO' ? 'selected' : ''}>Em Revisão</option>
+                <option value="CONCLUIDO" ${projectData.status === 'CONCLUIDO' ? 'selected' : ''}>Concluído</option>
+                <option value="CANCELADO" ${projectData.status === 'CANCELADO' ? 'selected' : ''}>Cancelado</option>
+            </select>
+            <label>Data de Início</label>
+            <input id="m-p-start" type="date" value="${projectData.startDate || ''}" required>
+            <label>Data de Fim</label>
+            <input id="m-p-end" type="date" value="${projectData.endDate || ''}">
+            <div class="modal-actions">
+                <button class="btn btn-outline" type="button" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" type="submit">Salvar</button>
+            </div>
+        </form>
+    `);
+}
+
+function fillProjectForm(p) {
+    document.getElementById('m-p-title').value = p.title || '';
+    document.getElementById('m-p-desc').value = p.description || '';
+    document.getElementById('m-p-sector').value = p.sector || '';
+    document.getElementById('m-p-status').value = p.status || 'PLANEJAMENTO';
+    document.getElementById('m-p-start').value = p.startDate || '';
+    document.getElementById('m-p-end').value = p.endDate || '';
+}
+
+async function saveProject(e, id) {
+    e.preventDefault();
+    const body = {
+        title: document.getElementById('m-p-title').value,
+        description: document.getElementById('m-p-desc').value,
+        sector: document.getElementById('m-p-sector').value,
+        status: document.getElementById('m-p-status').value,
+        startDate: document.getElementById('m-p-start').value,
+        endDate: document.getElementById('m-p-end').value || null
+    };
+
+    try {
+        if (id) {
+            await api(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+            toast('Projeto atualizado!');
+        } else {
+            await api('/projects', { method: 'POST', body: JSON.stringify(body) });
+            toast('Projeto criado!');
+        }
+        closeModal();
+        renderProjects(document.getElementById('content'));
+    } catch(e) {}
+}
+
+async function deleteProject(id) {
+    if (!confirm('Tem certeza que deseja excluir este projeto?')) return;
+    try {
+        await api(`/projects/${id}`, { method: 'DELETE' });
+        toast('Projeto excluído!');
+        renderProjects(document.getElementById('content'));
+    } catch(e) {}
+}
+
+async function showProjectDetail(id) {
+    const p = await api(`/projects/${id}`);
+    const media = await api(`/projects/${id}/media`);
+    const content = document.getElementById('content');
+    document.getElementById('page-title').textContent = 'Detalhes do Projeto';
+
+    content.innerHTML = `
+        <span class="back-link" onclick="navigate('projects', document.querySelectorAll('.sidebar nav a')[1])">← Voltar para Projetos</span>
+
+        <div class="detail-header">
+            <div>
+                <h3>${p.title}</h3>
+                <div class="detail-meta" style="margin-top:8px;">
+                    <span class="badge ${p.sector}">${p.sector.replace(/_/g, ' ')}</span>
+                    <span class="badge ${p.status}">${p.status.replace(/_/g, ' ')}</span>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-outline" onclick="openProjectModal('${p.id}')">✏️ Editar</button>
+                <button class="btn btn-primary" onclick="openMediaUploadModal('${p.id}')">📸 Upload Mídia</button>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+            <div class="stat-card"><div class="label">Data de Início</div><div class="number" style="font-size:18px;">${p.startDate ? new Date(p.startDate).toLocaleDateString('pt-BR') : '-'}</div></div>
+            <div class="stat-card"><div class="label">Data de Fim</div><div class="number" style="font-size:18px;">${p.endDate ? new Date(p.endDate).toLocaleDateString('pt-BR') : 'Sem data'}</div></div>
+        </div>
+
+        <div class="detail-section">
+            <h4>Descrição</h4>
+            <p>${p.description || 'Sem descrição.'}</p>
+        </div>
+
+        <div class="detail-section">
+            <h4>Fotos e Vídeos (${media.length})</h4>
+            ${media.length === 0 ? '<p style="color:#64748b;">Nenhuma mídia neste projeto.</p>' : `
+                <div class="media-grid">
+                    ${media.map(m => `
+                        <div class="media-card">
+                            ${m.mediaType === 'IMAGE'
+                                ? `<img src="/uploads/${m.fileKey.split('\\\\').pop().split('/').pop()}" alt="${m.fileName}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 160%22><rect fill=%22%231e293b%22 width=%22200%22 height=%22160%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%2364748b%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2214%22>Imagem</text></svg>'">`
+                                : `<video src="/uploads/${m.fileKey.split('\\\\').pop().split('/').pop()}" controls onerror="this.innerHTML='<p style=color:#64748b>Vídeo</p>'"></video>`
+                            }
+                            <div class="info">
+                                <p>${m.fileName}</p>
+                                ${m.description ? `<p style="color:#64748b;margin-top:4px;">${m.description}</p>` : ''}
+                                <button class="btn btn-danger btn-sm" style="margin-top:6px;" onclick="deleteMedia('${m.id}', '${p.id}')">🗑 Excluir</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `}
+        </div>
+    `;
+}
+
+// ========== MEDIA ==========
+function openMediaUploadModal(projectId) {
+    openModal(`
+        <h3>Upload de Mídia</h3>
+        <form onsubmit="uploadMedia(event, '${projectId}')">
+            <label>Arquivo (imagem ou vídeo)</label>
+            <input id="m-file" type="file" accept="image/*,video/*" required>
+            <label>Descrição (opcional)</label>
+            <input id="m-desc" placeholder="Descrição da foto/vídeo">
+            <div class="modal-actions">
+                <button class="btn btn-outline" type="button" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" type="submit">Upload</button>
+            </div>
+        </form>
+    `);
+}
+
+async function uploadMedia(e, projectId) {
+    e.preventDefault();
+    const fileInput = document.getElementById('m-file');
+    const desc = document.getElementById('m-desc').value;
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('projectId', projectId);
+    formData.append('description', desc);
+
+    try {
+        const res = await fetch(`${API}/projects/${projectId}/media`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        toast('Mídia enviada com sucesso!');
+        closeModal();
+        showProjectDetail(projectId);
+    } catch(e) {
+        toast(e.message, true);
+    }
+}
+
+async function deleteMedia(mediaId, projectId) {
+    if (!confirm('Excluir esta mídia?')) return;
+    try {
+        await api(`/media/${mediaId}`, { method: 'DELETE' });
+        toast('Mídia excluída!');
+        showProjectDetail(projectId);
+    } catch(e) {}
+}
+
+async function renderAllMedia(container) {
+    container.innerHTML = '<p style="color:#64748b;">Carregando mídias...</p>';
+    const media = await api('/media');
+
+    container.innerHTML = `
+        <h3 style="margin-bottom:16px;">Todas as Mídias (${media.length})</h3>
+        ${media.length === 0 ? '<p style="color:#64748b;">Nenhuma mídia encontrada.</p>' : `
+            <div class="media-grid">
+                ${media.map(m => `
+                    <div class="media-card">
+                        ${m.mediaType === 'IMAGE'
+                            ? `<img src="/uploads/${m.fileKey.split('\\\\').pop().split('/').pop()}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 160%22><rect fill=%22%231e293b%22 width=%22200%22 height=%22160%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%2364748b%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2214%22>Imagem</text></svg>'">`
+                            : `<video src="/uploads/${m.fileKey.split('\\\\').pop().split('/').pop()}" controls></video>`
+                        }
+                        <div class="info">
+                            <p><strong>${m.fileName}</strong></p>
+                            ${m.description ? `<p style="color:#64748b;margin-top:4px;">${m.description}</p>` : ''}
+                            <p style="margin-top:4px;">Projeto: ${m.projectId}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `}
+    `;
+}
+
+// ========== INVENTORY ==========
+async function renderInventory(container) {
+    container.innerHTML = '<p style="color:#64748b;">Carregando estoque...</p>';
+    const items = await api('/inventory');
+
+    container.innerHTML = `
+        <div class="toolbar">
+            <div class="filters">
+                <select id="filter-inv-cat" onchange="filterInventory()">
+                    <option value="">Todas categorias</option>
+                    <option value="SERRALHERIA">Serralheria</option>
+                    <option value="MECANICA">Mecânica</option>
+                    <option value="ELETRICA">Elétrica</option>
+                    <option value="PNEUMATICA">Pneumática</option>
+                    <option value="OUTROS">Outros</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="openItemModal()">+ Novo Item</button>
+        </div>
+        <div class="table-wrapper">
+            <table><thead><tr><th>Nº</th><th>Descrição</th><th>Fabricante</th><th>Código</th><th>Qtd</th><th>Unidade</th><th>Ações</th></tr></thead>
+            <tbody id="inventory-tbody"></tbody></table>
+        </div>
+    `;
+    filterInventory();
+}
+
+function filterInventory() {
+    const cat = document.getElementById('filter-inv-cat')?.value || '';
+    const tbody = document.getElementById('inventory-tbody');
+    if (!tbody) return;
+
+    api('/inventory').then(items => {
+        let filtered = items;
+        if (cat) filtered = filtered.filter(i => i.category === cat);
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum item encontrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(item => `
+            <tr>
+                <td style="font-weight:bold;color:#38bdf8;">${item.numero}</td>
+                <td><strong>${item.description}</strong></td>
+                <td>${item.fabricante}</td>
+                <td style="font-family:monospace;">${item.codigo}</td>
+                <td style="font-weight:bold;">${item.quantity}</td>
+                <td>${item.unit}</td>
+                <td><div class="actions">
+                    <button class="btn btn-success btn-sm" onclick="moveStock(${item.numero}, 'IN')" title="Entrada">📥</button>
+                    <button class="btn btn-danger btn-sm" onclick="moveStock(${item.numero}, 'OUT')" title="Saída">📤</button>
+                    <button class="btn btn-outline btn-sm" onclick="openItemModal(${item.numero})">✏️</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteItem(${item.numero})">🗑</button>
+                </div></td>
+            </tr>
+        `).join('');
+    });
+}
+
+async function openItemModal(num = null) {
+    const isEdit = !!num;
+    let data = { description: '', fabricante: '', codigo: '', category: '', quantity: 0, unit: 'UNIDADE' };
+
+    if (isEdit) {
+        data = await api(`/inventory/${num}`);
+    }
+
+    // Usa variável global temporária para evitar problema de interpolação
+    window._editItemNumero = isEdit ? num : null;
+
+    openModal(`
+        <h3>${isEdit ? 'Editar' : 'Novo'} Item</h3>
+        <form id="item-form">
+            <label>Descrição do Material</label>
+            <input id="m-i-desc" value="${escapeHtml(data.description || '')}" placeholder="Ex: Fio AWG 14 vermelho" required>
+            <label>Fabricante</label>
+            <input id="m-i-fab" value="${escapeHtml(data.fabricante || '')}" placeholder="Ex: Siemens, Prysmian" required>
+            <label>Código do Produto</label>
+            <input id="m-i-cod" value="${escapeHtml(data.codigo || '')}" placeholder="Ex: 5TT401-0" required>
+            <label>Categoria</label>
+            <select id="m-i-cat" required>
+                <option value="">Selecione</option>
+                <option value="SERRALHERIA" ${data.category === 'SERRALHERIA' ? 'selected' : ''}>Serralheria</option>
+                <option value="MECANICA" ${data.category === 'MECANICA' ? 'selected' : ''}>Mecânica</option>
+                <option value="ELETRICA" ${data.category === 'ELETRICA' ? 'selected' : ''}>Elétrica</option>
+                <option value="PNEUMATICA" ${data.category === 'PNEUMATICA' ? 'selected' : ''}>Pneumática</option>
+                <option value="OUTROS" ${data.category === 'OUTROS' ? 'selected' : ''}>Outros</option>
+            </select>
+            <label>Quantidade em Estoque</label>
+            <input id="m-i-qty" type="number" min="0" step="any" value="${data.quantity ?? 0}">
+            <label>Unidade de Medida</label>
+            <select id="m-i-unit" required>
+                <option value="UNIDADE" ${data.unit === 'UNIDADE' ? 'selected' : ''}>Unidade</option>
+                <option value="METRO" ${data.unit === 'METRO' ? 'selected' : ''}>Metro (m)</option>
+                <option value="KG" ${data.unit === 'KG' ? 'selected' : ''}>Quilograma (Kg)</option>
+                <option value="LITRO" ${data.unit === 'LITRO' ? 'selected' : ''}>Litro (L)</option>
+                <option value="CAIXA" ${data.unit === 'CAIXA' ? 'selected' : ''}>Caixa</option>
+                <option value="ROLO" ${data.unit === 'ROLO' ? 'selected' : ''}>Rolo</option>
+                <option value="PAR" ${data.unit === 'PAR' ? 'selected' : ''}>Par</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn btn-outline" type="button" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" type="submit">Salvar</button>
+            </div>
+        </form>
+    `);
+
+    // Bind do submit após inserir o HTML
+    document.getElementById('item-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        doSaveItem(window._editItemNumero);
+    });
+}
+
+function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function doSaveItem(num) {
+    const body = {
+        description: document.getElementById('m-i-desc').value,
+        fabricante: document.getElementById('m-i-fab').value,
+        codigo: document.getElementById('m-i-cod').value,
+        category: document.getElementById('m-i-cat').value,
+        quantity: parseFloat(document.getElementById('m-i-qty').value) || 0,
+        unit: document.getElementById('m-i-unit').value
+    };
+
+    try {
+        if (num !== null && num !== undefined) {
+            await api(`/inventory/${num}`, { method: 'PUT', body: JSON.stringify(body) });
+            toast('Item atualizado!');
+        } else {
+            await api('/inventory', { method: 'POST', body: JSON.stringify(body) });
+            toast('Item criado!');
+        }
+        closeModal();
+        renderInventory(document.getElementById('content'));
+    } catch(err) {
+        console.error('Erro ao salvar item:', err);
+    }
+}
+
+async function deleteItem(num) {
+    if (!confirm('Excluir este item?')) return;
+    try {
+        await api(`/inventory/${num}`, { method: 'DELETE' });
+        toast('Item excluído!');
+        renderInventory(document.getElementById('content'));
+    } catch(e) {}
+}
+
+function moveStock(num, type) {
+    openModal(`
+        <h3>${type === 'IN' ? '📥 Entrada' : '📤 Saída'} de Estoque</h3>
+        <form onsubmit="doMove(event, ${num}, '${type}')">
+            <label>Quantidade</label>
+            <input id="m-move-qty" type="number" min="0.01" step="any" required>
+            <label>Motivo</label>
+            <input id="m-move-reason" placeholder="Ex: Compra NF 1234, Projeto Portão" required>
+            <div class="modal-actions">
+                <button class="btn btn-outline" type="button" onclick="closeModal()">Cancelar</button>
+                <button class="btn ${type === 'IN' ? 'btn-success' : 'btn-danger'}" type="submit">Confirmar ${type === 'IN' ? 'Entrada' : 'Saída'}</button>
+            </div>
+        </form>
+    `);
+}
+
+async function doMove(e, num, type) {
+    e.preventDefault();
+    const body = {
+        type,
+        quantity: parseFloat(document.getElementById('m-move-qty').value),
+        reason: document.getElementById('m-move-reason').value
+    };
+    try {
+        await api(`/inventory/${num}/move`, { method: 'POST', body: JSON.stringify(body) });
+        toast(`${type === 'IN' ? 'Entrada' : 'Saída'} registrada!`);
+        closeModal();
+        renderInventory(document.getElementById('content'));
+    } catch(e) {}
+}
+
+// ========== INIT ==========
+</script>
+</body>
+</html>

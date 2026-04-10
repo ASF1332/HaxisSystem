@@ -1,20 +1,244 @@
-### 1. Cadastrar um novo usuário (PARA TER UM USUÁRIO DE TESTE)
+### ============================================
+### USUÁRIOS
+### ============================================
+
+### Criar usuário
 POST http://localhost:3000/api/users
 Content-Type: application/json
 
 {
   "name": "Usuario Teste",
-  "email": "teste@email.com",
-  "password": "123",
+  "email": "usuario@email.com",
+  "password": "123456",
   "role": "PROGRAMADOR"
 }
 
-###
-### 2. Tentar fazer login com as credenciais corretas
-POST http://localhost:3000/api/users
+### Login
+POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
   "email": "teste@email.com",
-  "password": "123"
+  "password": "123456"
 }
+
+### ============================================
+### PROJETOS
+### ============================================
+
+### Criar projeto - Serralheria
+POST http://localhost:3000/api/projects
+Content-Type: application/json
+
+{
+  "title": "Portão Automatizado Residencial",
+  "description": "Fabricação e instalação de portão basculante com automação",
+  "sector": "SERRALHERIA",
+  "status": "PLANEJAMENTO",
+  "startDate": "2026-04-10",
+  "endDate": "2026-05-15",
+  "responsibleId": "admin-01"
+}
+
+### Criar projeto - Automação
+POST http://localhost:3000/api/projects
+Content-Type: application/json
+
+{
+  "title": "Painel CLP - Linha de Produção",
+  "description": "Automação da linha de empacotamento com CLP e IHM",
+  "sector": "AUTOMACAO",
+  "status": "EM_ANDAMENTO",
+  "startDate": "2026-04-01",
+  "endDate": "2026-06-30",
+  "responsibleId": "admin-01"
+}
+
+### Criar projeto - Engenharia Mecânica
+POST http://localhost:3000/api/projects
+Content-Type: application/json
+
+{
+  "title": "Adequação NR-12 - Prensa Hidráulica",
+  "description": "Adequação de prensa hidráulica conforme NR-12 com instalação de proteções e sensores",
+  "sector": "ENGENHARIA_MECANICA",
+  "status": "EM_ANDAMENTO",
+  "startDate": "2026-03-15",
+  "endDate": "2026-04-30",
+  "responsibleId": "admin-01"
+}
+
+### Listar todos os projetos
+GET http://localhost:3000/api/projects
+
+### Listar projetos por setor
+GET http://localhost:3000/api/projects/sector/SERRALHERIA
+
+### Buscar projeto por ID
+GET http://localhost:3000/api/projects/proj-123
+
+### Atualizar projeto
+PUT http://localhost:3000/api/projects/proj-123
+Content-Type: application/json
+
+{
+  "title": "Portão Atualizado",
+  "status": "EM_ANDAMENTO"
+}
+
+### Atualizar status do projeto
+PATCH http://localhost:3000/api/projects/proj-123/status
+Content-Type: application/json
+
+{
+  "status": "CONCLUIDO"
+}
+
+### Deletar projeto
+DELETE http://localhost:3000/api/projects/proj-123
+
+### ============================================
+### ESTOQUE
+### ============================================
+
+### Criar item de estoque
+POST http://localhost:3000/api/inventory
+Content-Type: application/json
+
+{
+  "description": "Chapa de Aço 2mm",
+  "fabricante": "Aços Brasil",
+  "codigo": "CHAPA-ACO-2MM",
+  "category": "SERRALHERIA",
+  "quantity": 50,
+  "unit": "UNIDADE"
+}
+
+### Criar item - Componente Elétrico
+POST http://localhost:3000/api/inventory
+Content-Type: application/json
+
+{
+  "description": "Sensor Indutivo",
+  "fabricante": "Peças Automação LTDA",
+  "codigo": "SENSOR-IND-01",
+  "category": "ELETRICA",
+  "quantity": 20,
+  "unit": "UNIDADE"
+}
+
+### Listar todos os itens
+GET http://localhost:3000/api/inventory
+
+### Buscar item por número
+GET http://localhost:3000/api/inventory/1
+
+### Atualizar item
+PUT http://localhost:3000/api/inventory/1
+Content-Type: application/json
+
+{
+  "quantity": 100,
+  "fabricante": "Fornecedor Atualizado"
+}
+
+### Entrada de material (IN)
+POST http://localhost:3000/api/inventory/1/move
+Content-Type: application/json
+
+{
+  "type": "IN",
+  "quantity": 30,
+  "reason": "Compra fornecedor - NF 1234",
+  "userId": "admin-01"
+}
+
+### Saída de material (OUT)
+POST http://localhost:3000/api/inventory/1/move
+Content-Type: application/json
+
+{
+  "type": "OUT",
+  "quantity": 10,
+  "reason": "Projeto Portão Automatizado",
+  "userId": "admin-01"
+}
+
+### Histórico de movimentação de um item
+GET http://localhost:3000/api/inventory/1/movements
+
+### Todas as movimentações
+GET http://localhost:3000/api/inventory/movements
+
+### Deletar item
+DELETE http://localhost:3000/api/inventory/1
+
+### ============================================
+### MÍDIA (FOTOS/VÍDEOS)
+### ============================================
+
+### Upload de foto do projeto
+POST http://localhost:3000/api/projects/proj-123/media
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="projectId"
+
+proj-123
+--boundary
+Content-Disposition: form-data; name="description"
+
+Foto da estrutura montada
+--boundary
+Content-Disposition: form-data; name="file"; filename="teste.jpg"
+Content-Type: image/jpeg
+
+< ./imagem-exemplo.jpg
+--boundary--
+
+### Upload de vídeo do projeto
+POST http://localhost:3000/api/projects/proj-123/media
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="projectId"
+
+proj-123
+--boundary
+Content-Disposition: form-data; name="description"
+
+Vídeo do teste de funcionamento
+--boundary
+Content-Disposition: form-data; name="file"; filename="teste.mp4"
+Content-Type: video/mp4
+
+< ./video-exemplo.mp4
+--boundary--
+
+### Listar mídias de um projeto
+GET http://localhost:3000/api/projects/proj-123/media
+
+### Listar todas as mídias
+GET http://localhost:3000/api/media
+
+### Buscar mídia por ID
+GET http://localhost:3000/api/media/media-123
+
+### Deletar mídia
+DELETE http://localhost:3000/api/media/media-123
+
+### Acessar arquivo de upload (exemplo)
+GET http://localhost:3000/uploads/nome-do-arquivo.jpg
+
+### ============================================
+### DASHBOARD
+### ============================================
+
+### Métricas gerais do dashboard
+GET http://localhost:3000/api/dashboard
+
+### Métricas de projetos
+GET http://localhost:3000/api/dashboard/projects
+
+### Métricas de estoque
+GET http://localhost:3000/api/dashboard/inventory
