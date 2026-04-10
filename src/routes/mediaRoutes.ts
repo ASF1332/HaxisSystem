@@ -4,6 +4,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { authMiddleware } from '../middleware/auth';
 import {
     uploadMedia,
     getProjectMedia,
@@ -13,6 +14,8 @@ import {
 } from '../controllers/mediaController';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // Configurar storage do multer
 const uploadDir = path.join(__dirname, '..', '..', 'uploads');

@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HaxisSystem - Teste Rápido</title>
+    <title>HaxisSystem - Teste Rapido</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
         h1 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
         .container { max-width: 1200px; margin: 0 auto; }
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+        .card h2, .card h3 { color: #38bdf8; margin-bottom: 10px; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab { padding: 10px 20px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; color: #94a3b8; }
         .tab.active { background: #0ea5e9; color: white; border-color: #0ea5e9; }
         .panel { display: none; }
         .panel.active { display: block; }
-        .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
-        .card h3 { color: #38bdf8; margin-bottom: 8px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat { background: #1e293b; padding: 16px; border-radius: 10px; text-align: center; }
+        .stat .number { font-size: 2em; font-weight: bold; color: #38bdf8; }
+        .stat .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        form { display: flex; flex-direction: column; gap: 10px; max-width: 500px; }
+        input, select, textarea { padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; font-size: 14px; }
+        button { padding: 10px 20px; background: #0ea5e9; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0284c7; }
+        .response { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; white-space: pre-wrap; margin-top: 10px; max-height: 300px; overflow-y: auto; }
         .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .badge.planejamento { background: #f59e0b33; color: #f59e0b; }
         .badge.em_andamento { background: #3b82f633; color: #3b82f6; }
@@ -26,110 +35,176 @@
         .badge.SERRALHERIA { background: #eab30833; color: #eab308; }
         .badge.AUTOMACAO { background: #06b6d433; color: #06b6d4; }
         .badge.ENGENHARIA_MECANICA { background: #8b5cf633; color: #8b5cf6; }
-        form { display: flex; flex-direction: column; gap: 10px; max-width: 500px; }
-        input, select, textarea { padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; font-size: 14px; }
-        button { padding: 10px 20px; background: #0ea5e9; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0284c7; }
-        .response { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; white-space: pre-wrap; margin-top: 10px; max-height: 300px; overflow-y: auto; }
-        .low-stock { border-left: 3px solid #ef4444; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .stat { background: #1e293b; padding: 16px; border-radius: 10px; text-align: center; }
-        .stat .number { font-size: 2em; font-weight: bold; color: #38bdf8; }
-        .stat .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .status { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .status span { color: #94a3b8; font-size: 14px; }
+        .error { color: #fca5a5; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🔧 HaxisSystem - Painel</h1>
+    <h1>HaxisSystem - Painel</h1>
 
-    <div class="grid" id="stats"></div>
-
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('projects')">📋 Projetos</div>
-        <div class="tab" onclick="showTab('inventory')">📦 Estoque</div>
-        <div class="tab" onclick="showTab('new-project')">➕ Novo Projeto</div>
-        <div class="tab" onclick="showTab('new-item')">➕ Novo Item</div>
+    <div class="card">
+        <h2>Autenticacao</h2>
+        <form onsubmit="login(event)">
+            <input id="login-email" placeholder="Email ou nome" value="teste@email.com" required>
+            <input id="login-password" type="password" placeholder="Senha" value="123456" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <div class="response" id="login-response"></div>
     </div>
 
-    <!-- PROJETOS -->
-    <div class="panel active" id="projects">
-        <button onclick="loadProjects()" style="margin-bottom: 12px;">🔄 Atualizar</button>
-        <div id="projects-list"></div>
+    <div class="status">
+        <span id="auth-status">Nao autenticado.</span>
+        <button id="logout-btn" class="hidden" onclick="logout()">Sair</button>
     </div>
 
-    <!-- ESTOQUE -->
-    <div class="panel" id="inventory">
-        <button onclick="loadInventory()" style="margin-bottom: 12px;">🔄 Atualizar</button>
-        <div id="inventory-list"></div>
-    </div>
+    <div id="app" class="hidden">
+        <div class="grid" id="stats"></div>
 
-    <!-- NOVO PROJETO -->
-    <div class="panel" id="new-project">
-        <div class="card">
-            <h3>Criar Projeto</h3>
-            <form onsubmit="createProject(event)">
-                <input id="p-title" placeholder="Título do projeto" required>
-                <textarea id="p-desc" placeholder="Descrição"></textarea>
-                <select id="p-sector" required>
-                    <option value="">Selecione o setor</option>
-                    <option value="SERRALHERIA">Serralheria</option>
-                    <option value="AUTOMACAO">Automação</option>
-                    <option value="ENGENHARIA_MECANICA">Engenharia Mecânica</option>
-                </select>
-                <input id="p-start" type="date" required>
-                <input id="p-end" type="date">
-                <button type="submit">Criar Projeto</button>
-            </form>
-            <div class="response" id="p-response"></div>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab(event, 'projects')">Projetos</div>
+            <div class="tab" onclick="showTab(event, 'inventory')">Estoque</div>
+            <div class="tab" onclick="showTab(event, 'new-project')">Novo Projeto</div>
+            <div class="tab" onclick="showTab(event, 'new-item')">Novo Item</div>
         </div>
-    </div>
 
-    <!-- NOVO ITEM -->
-    <div class="panel" id="new-item">
-        <div class="card">
-            <h3>Adicionar ao Estoque</h3>
-            <form onsubmit="createItem(event)">
-                <input id="i-description" placeholder="Descrição do material" required>
-                <input id="i-fabricante" placeholder="Fabricante" required>
-                <input id="i-codigo" placeholder="Código do produto" required>
-                <select id="i-category" required>
-                    <option value="">Selecione a categoria</option>
-                    <option value="SERRALHERIA">Serralheria</option>
-                    <option value="MECANICA">Mecânica</option>
-                    <option value="ELETRICA">Elétrica</option>
-                    <option value="PNEUMATICA">Pneumática</option>
-                    <option value="OUTROS">Outros</option>
-                </select>
-                <input id="i-qty" type="number" placeholder="Quantidade" min="0" value="0">
-                <select id="i-unit" required>
-                    <option value="UNIDADE">Unidade</option>
-                    <option value="KG">Kg</option>
-                    <option value="METRO">Metro</option>
-                    <option value="LITRO">Litro</option>
-                    <option value="CAIXA">Caixa</option>
-                    <option value="PAR">Par</option>
-                    <option value="ROLO">Rolo</option>
-                </select>
-                <button type="submit">Adicionar</button>
-            </form>
-            <div class="response" id="i-response"></div>
+        <div class="panel active" id="projects">
+            <button onclick="loadProjects()" style="margin-bottom: 12px;">Atualizar</button>
+            <div id="projects-list"></div>
+        </div>
+
+        <div class="panel" id="inventory">
+            <button onclick="loadInventory()" style="margin-bottom: 12px;">Atualizar</button>
+            <div id="inventory-list"></div>
+        </div>
+
+        <div class="panel" id="new-project">
+            <div class="card">
+                <h3>Criar Projeto</h3>
+                <form onsubmit="createProject(event)">
+                    <input id="p-title" placeholder="Titulo do projeto" required>
+                    <textarea id="p-desc" placeholder="Descricao"></textarea>
+                    <select id="p-sector" required>
+                        <option value="">Selecione o setor</option>
+                        <option value="SERRALHERIA">Serralheria</option>
+                        <option value="AUTOMACAO">Automacao</option>
+                        <option value="ENGENHARIA_MECANICA">Engenharia Mecanica</option>
+                    </select>
+                    <input id="p-start" type="date" required>
+                    <input id="p-end" type="date">
+                    <button type="submit">Criar Projeto</button>
+                </form>
+                <div class="response" id="p-response"></div>
+            </div>
+        </div>
+
+        <div class="panel" id="new-item">
+            <div class="card">
+                <h3>Adicionar ao Estoque</h3>
+                <form onsubmit="createItem(event)">
+                    <input id="i-description" placeholder="Descricao do material" required>
+                    <input id="i-fabricante" placeholder="Fabricante" required>
+                    <input id="i-codigo" placeholder="Codigo do produto" required>
+                    <select id="i-category" required>
+                        <option value="">Selecione a categoria</option>
+                        <option value="SERRALHERIA">Serralheria</option>
+                        <option value="MECANICA">Mecanica</option>
+                        <option value="ELETRICA">Eletrica</option>
+                        <option value="PNEUMATICA">Pneumatica</option>
+                        <option value="OUTROS">Outros</option>
+                    </select>
+                    <input id="i-qty" type="number" placeholder="Quantidade" min="0" value="0">
+                    <select id="i-unit" required>
+                        <option value="UNIDADE">Unidade</option>
+                        <option value="KG">Kg</option>
+                        <option value="METRO">Metro</option>
+                        <option value="LITRO">Litro</option>
+                        <option value="CAIXA">Caixa</option>
+                        <option value="PAR">Par</option>
+                        <option value="ROLO">Rolo</option>
+                    </select>
+                    <button type="submit">Adicionar</button>
+                </form>
+                <div class="response" id="i-response"></div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
 const API = 'http://localhost:3000/api';
+let token = null;
+let currentUser = null;
 
-function showTab(name) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+function updateAuthUI() {
+    document.getElementById('app').classList.toggle('hidden', !token);
+    document.getElementById('logout-btn').classList.toggle('hidden', !token);
+    document.getElementById('auth-status').textContent = token
+        ? `Autenticado como ${currentUser.name} (${currentUser.role})`
+        : 'Nao autenticado.';
+}
+
+function showTab(event, name) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+    event.currentTarget.classList.add('active');
     document.getElementById(name).classList.add('active');
-    event.target.classList.add('active');
+}
+
+async function api(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    const response = await fetch(`${API}${path}`, { ...options, headers });
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Erro na requisicao.');
+    }
+
+    return data;
+}
+
+async function login(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const responseBox = document.getElementById('login-response');
+
+    try {
+        const data = await api('/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+            headers: {}
+        });
+
+        token = data.token;
+        currentUser = data.user;
+        responseBox.textContent = JSON.stringify(data, null, 2);
+        updateAuthUI();
+        await refreshAll();
+    } catch (error) {
+        responseBox.textContent = error.message;
+        responseBox.classList.add('error');
+    }
+}
+
+function logout() {
+    token = null;
+    currentUser = null;
+    document.getElementById('login-response').textContent = '';
+    updateAuthUI();
 }
 
 async function loadProjects() {
-    const res = await fetch(`${API}/projects`);
-    const data = await res.json();
+    const data = await api('/projects');
     const list = document.getElementById('projects-list');
 
     if (data.length === 0) {
@@ -137,24 +212,23 @@ async function loadProjects() {
         return;
     }
 
-    list.innerHTML = data.map(p => {
-        const statusClass = p.status.toLowerCase().replace(/ /g, '_');
+    list.innerHTML = data.map(project => {
+        const statusClass = project.status.toLowerCase();
         return `<div class="card">
-            <h3>${p.title}</h3>
-            <p style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${p.description || 'Sem descrição'}</p>
-            <span class="badge ${statusClass}">${p.status.replace(/_/g, ' ')}</span>
-            <span class="badge ${p.sector}">${p.sector.replace(/_/g, ' ')}</span>
+            <h3>${project.title}</h3>
+            <p style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${project.description || 'Sem descricao'}</p>
+            <span class="badge ${statusClass}">${project.status.replace(/_/g, ' ')}</span>
+            <span class="badge ${project.sector}">${project.sector.replace(/_/g, ' ')}</span>
             <div style="margin-top:8px;font-size:13px;color:#64748b;">
-                Início: ${new Date(p.startDate).toLocaleDateString('pt-BR')}
-                ${p.endDate ? ' | Fim: ' + new Date(p.endDate).toLocaleDateString('pt-BR') : ''}
+                Inicio: ${new Date(project.startDate).toLocaleDateString('pt-BR')}
+                ${project.endDate ? ' | Fim: ' + new Date(project.endDate).toLocaleDateString('pt-BR') : ''}
             </div>
         </div>`;
     }).join('');
 }
 
 async function loadInventory() {
-    const res = await fetch(`${API}/inventory`);
-    const data = await res.json();
+    const data = await api('/inventory');
     const list = document.getElementById('inventory-list');
 
     if (data.length === 0) {
@@ -162,26 +236,24 @@ async function loadInventory() {
         return;
     }
 
-    list.innerHTML = data.map(item => {
-        return `<div class="card">
+    list.innerHTML = data.map(item => `
+        <div class="card">
             <h3>#${item.numero} ${item.description}</h3>
             <p style="font-size:14px;">Quantidade: <strong>${item.quantity}</strong> ${item.unit}</p>
             <p style="font-size:12px;color:#94a3b8;">Categoria: ${item.category.replace(/_/g, ' ')}</p>
             <p style="font-size:12px;color:#94a3b8;">Fabricante: ${item.fabricante}</p>
-            <p style="font-size:12px;color:#94a3b8;">Código: ${item.codigo}</p>
-        </div>`;
-    }).join('');
+            <p style="font-size:12px;color:#94a3b8;">Codigo: ${item.codigo}</p>
+        </div>
+    `).join('');
 }
 
 async function loadStats() {
-    const [pRes, iRes] = await Promise.all([
-        fetch(`${API}/projects`),
-        fetch(`${API}/inventory`)
+    const [projects, items] = await Promise.all([
+        api('/projects'),
+        api('/inventory')
     ]);
-    const projects = await pRes.json();
-    const items = await iRes.json();
-    const active = projects.filter(p => p.status === 'EM_ANDAMENTO').length;
-    const serralheriaCount = items.filter(i => i.category === 'SERRALHERIA').length;
+    const active = projects.filter(project => project.status === 'EM_ANDAMENTO').length;
+    const serralheriaCount = items.filter(item => item.category === 'SERRALHERIA').length;
 
     document.getElementById('stats').innerHTML = `
         <div class="stat"><div class="number">${projects.length}</div><div class="label">Total Projetos</div></div>
@@ -191,8 +263,8 @@ async function loadStats() {
     `;
 }
 
-async function createProject(e) {
-    e.preventDefault();
+async function createProject(event) {
+    event.preventDefault();
     const body = {
         title: document.getElementById('p-title').value,
         description: document.getElementById('p-desc').value,
@@ -200,44 +272,43 @@ async function createProject(e) {
         startDate: document.getElementById('p-start').value,
         endDate: document.getElementById('p-end').value || null
     };
-    const res = await fetch(`${API}/projects`, {
+
+    const data = await api('/projects', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
     });
-    const data = await res.json();
+
     document.getElementById('p-response').textContent = JSON.stringify(data, null, 2);
-    e.target.reset();
-    loadProjects();
-    loadStats();
+    event.target.reset();
+    await refreshAll();
 }
 
-async function createItem(e) {
-    e.preventDefault();
+async function createItem(event) {
+    event.preventDefault();
     const body = {
         description: document.getElementById('i-description').value,
         fabricante: document.getElementById('i-fabricante').value,
         codigo: document.getElementById('i-codigo').value,
         category: document.getElementById('i-category').value,
-        quantity: parseInt(document.getElementById('i-qty').value),
+        quantity: parseInt(document.getElementById('i-qty').value, 10) || 0,
         unit: document.getElementById('i-unit').value
     };
-    const res = await fetch(`${API}/inventory`, {
+
+    const data = await api('/inventory', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
     });
-    const data = await res.json();
+
     document.getElementById('i-response').textContent = JSON.stringify(data, null, 2);
-    e.target.reset();
-    loadInventory();
-    loadStats();
+    event.target.reset();
+    await refreshAll();
 }
 
-// Inicializar
-loadProjects();
-loadInventory();
-loadStats();
+async function refreshAll() {
+    await Promise.all([loadProjects(), loadInventory(), loadStats()]);
+}
+
+updateAuthUI();
 </script>
 </body>
 </html>

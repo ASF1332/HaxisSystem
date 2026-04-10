@@ -15,7 +15,7 @@ const users: User[] = [];
         name: "André Schenkel", // <--- NOME ALTERADO
         email: "teste@email.com",
         passwordHash: hash,
-        role: "Administrator" as any
+        role: UserRole.GESTOR
     });
 
     console.log(">>> ADMIN CRIADO: André Schenkel (teste@email.com / 123456) <<<");
@@ -32,6 +32,10 @@ export const createUser = async (req: Request, res: Response) => {
 
         if (users.find(user => user.email === email)) {
             return res.status(409).json({ message: 'Este email já está em uso.' });
+        }
+
+        if (!Object.values(UserRole).includes(role)) {
+            return res.status(400).json({ message: 'Role inválida.' });
         }
 
         const salt = await bcrypt.genSalt(10);

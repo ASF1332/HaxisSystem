@@ -1,6 +1,7 @@
 // src/routes/inventoryRoutes.ts
 
 import { Router } from 'express';
+import { authMiddleware } from '../middleware/auth';
 import {
     createInventoryItem,
     getAllItems,
@@ -13,6 +14,8 @@ import {
 } from '../controllers/inventoryController';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // CRUD de itens
 router.post('/inventory', createInventoryItem);

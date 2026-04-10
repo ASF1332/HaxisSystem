@@ -127,7 +127,8 @@ Estado atual:
   - `id: admin-01`
   - `email: teste@email.com`
   - `senha: 123456`
-- O middleware JWT existe, mas as rotas da API ainda nao estao protegidas por ele.
+- `role: GESTOR`
+- As rotas de projetos, estoque, midia e dashboard exigem JWT.
 
 Roles definidas no modelo:
 
@@ -137,9 +138,9 @@ Roles definidas no modelo:
 - `GESTOR`
 - `DESENVOLVEDOR`
 
-Observacao:
+Validacao:
 
-- O usuario admin fixo atual e criado com role `"Administrator"` no controller, fora do enum formal de `UserRole`.
+- O cadastro de usuario agora rejeita roles fora do enum `UserRole`.
 
 ### 2. Projetos
 
@@ -290,6 +291,13 @@ Metricas atuais de estoque:
 
 Todas as rotas abaixo sao montadas sob o prefixo `/api`.
 
+Rotas protegidas por JWT:
+
+- todos os endpoints de `Projetos`
+- todos os endpoints de `Estoque`
+- todos os endpoints de `Midia`
+- todos os endpoints de `Dashboard`
+
 ### Usuarios/Auth
 
 | Metodo | Rota | Descricao |
@@ -395,6 +403,7 @@ Contem um painel completo com:
 
 Contem um painel simples para testes rapidos de:
 
+- login com JWT
 - criacao de projetos
 - criacao de itens de estoque
 - listagem basica de projetos
@@ -443,7 +452,6 @@ Servidor padrao:
 - Persistencia totalmente em memoria
 - Sem banco de dados
 - Sem validacao forte de payload com schema
-- Middleware JWT ainda nao aplicado nas rotas
 - Sem controle de permissao real por role nas rotas
 - Sem testes automatizados
 - Frontend acoplado em HTML estatico
