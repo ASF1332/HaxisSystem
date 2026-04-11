@@ -7,12 +7,16 @@ import fs from 'fs';
 import { authMiddleware } from '../middleware/auth';
 import {
     createProject,
+    createScheduleItem,
     getAllProjects,
     getProjectById,
+    getProjectSchedule,
     updateProject,
     deleteProject,
+    deleteScheduleItem,
     getProjectsBySector,
     updateProjectStatus,
+    updateScheduleItem,
     uploadProjectCover
 } from '../controllers/projectController';
 
@@ -50,6 +54,10 @@ router.post('/projects', createProject);
 router.get('/projects', getAllProjects);
 router.get('/projects/sector/:sector', getProjectsBySector);
 router.post('/projects/:id/cover', coverUpload.single('coverImage'), uploadProjectCover);
+router.get('/projects/:id/schedule', getProjectSchedule);
+router.post('/projects/:id/schedule', createScheduleItem);
+router.put('/projects/:id/schedule/:itemId', updateScheduleItem);
+router.delete('/projects/:id/schedule/:itemId', deleteScheduleItem);
 router.get('/projects/:id', getProjectById);
 router.put('/projects/:id', updateProject);
 router.delete('/projects/:id', deleteProject);

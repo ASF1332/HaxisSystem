@@ -90,8 +90,8 @@
             <div class="card">
                 <h3>Criar Projeto</h3>
                 <form onsubmit="createProject(event)">
-                    <input id="p-title" placeholder="Titulo do projeto" required>
-                    <textarea id="p-desc" placeholder="Descricao"></textarea>
+                    <input id="p-title" placeholder="Título do projeto" required>
+                    <textarea id="p-desc" placeholder="Descrição"></textarea>
                     <select id="p-sector" required>
                         <option value="">Selecione o setor</option>
                         <option value="AUTOMACAO">Automação</option>
@@ -110,9 +110,9 @@
             <div class="card">
                 <h3>Adicionar ao Estoque</h3>
                 <form onsubmit="createItem(event)">
-                    <input id="i-description" placeholder="Descricao do material" required>
+                    <input id="i-description" placeholder="Descrição do material" required>
                     <input id="i-fabricante" placeholder="Fabricante" required>
-                    <input id="i-codigo" placeholder="Codigo do produto" required>
+                    <input id="i-codigo" placeholder="Código do produto" required>
                     <select id="i-category" required>
                         <option value="">Selecione a categoria</option>
                         <option value="SERRALHERIA">Serralheria</option>
@@ -234,11 +234,11 @@ async function loadProjects() {
         const statusClass = project.status.toLowerCase();
         return `<div class="card">
             <h3>${project.title}</h3>
-            <p style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${project.description || 'Sem descricao'}</p>
+            <p style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${project.description || 'Sem descrição'}</p>
             <span class="badge ${statusClass}">${project.status.replace(/_/g, ' ')}</span>
             <span class="badge ${project.sector}">${projectSectorLabels[project.sector] || project.sector}</span>
             <div style="margin-top:8px;font-size:13px;color:#64748b;">
-                Inicio: ${new Date(project.startDate).toLocaleDateString('pt-BR')}
+                Início: ${new Date(project.startDate).toLocaleDateString('pt-BR')}
                 ${project.endDate ? ' | Fim: ' + new Date(project.endDate).toLocaleDateString('pt-BR') : ''}
             </div>
         </div>`;
